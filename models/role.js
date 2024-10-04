@@ -22,14 +22,14 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {});
 
-  Role.associate = function(models) {
-    Role.hasMany(models.User, {
-      foreignKey: 'roleId',
-      as: 'users',
-      onDelete: 'SET NULL',
-      onUpdate: 'CASCADE'
-    });
-  };
+  // Role.associate = function(models) {
+  //   Role.hasMany(models.User, {
+  //     foreignKey: 'roleId',
+  //     as: 'users',
+  //     onDelete: 'SET NULL',
+  //     onUpdate: 'CASCADE'
+  //   });
+  // };
 
   return Role;
 };
