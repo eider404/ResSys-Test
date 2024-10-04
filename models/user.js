@@ -18,11 +18,19 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'Roles',  // Aquí es donde debe coincidir con el nombre de la tabla
+        model: 'Roles',
         key: 'id'
       },
       onUpdate: 'CASCADE',
       onDelete: 'SET NULL'
+    },
+    status: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1,
+      validate: {
+        isIn: [[0, 1]]
+      }
     }
   }, {});
 
