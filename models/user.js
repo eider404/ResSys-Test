@@ -1,6 +1,6 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
-  const User = sequelize.define('User', {
+  const Users = sequelize.define('Users', {
     name: {
       type: DataTypes.STRING,
       allowNull: false
@@ -34,8 +34,8 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {});
 
-  User.associate = function(models) {
-    User.belongsTo(models.Role, {
+  Users.associate = function(models) {
+    Users.belongsTo(models.Role, {
       foreignKey: 'roleId',
       as: 'role',
       onDelete: 'SET NULL',
@@ -43,5 +43,5 @@ module.exports = (sequelize, DataTypes) => {
     });
   };
 
-  return User;
+  return Users;
 };
