@@ -7,11 +7,14 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
       primaryKey: true
     },
-    name: {
+    categoryName: {
       type: DataTypes.STRING,
       allowNull: false,
     }
-  }, {});
+  }, {
+    freezeTableName: true,
+    timestamps: false
+  });
 
 
   return Category;

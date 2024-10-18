@@ -6,8 +6,8 @@ require('dotenv').config();
 
 app.use(express.json());
 
-// const reservasRoutes = require('./routes/reservas');
-// app.use('/api', reservasRoutes);
+const indexRoutes = require('./routes/indexRouter');
+app.use('/api', indexRoutes);
 
 const authRoutes = require('./routes/auth');
 app.use('/auth', authRoutes);
