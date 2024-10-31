@@ -1,6 +1,11 @@
-'use strict';
+// models/user.js
 module.exports = (sequelize, DataTypes) => {
-  const Users = sequelize.define('Users', {
+  const User = sequelize.define('User', {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
     name: {
       type: DataTypes.STRING,
       allowNull: false
@@ -8,7 +13,10 @@ module.exports = (sequelize, DataTypes) => {
     email: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true
+      unique: true,
+      validate: {
+        isEmail: true
+      }
     },
     password: {
       type: DataTypes.STRING,
@@ -18,30 +26,33 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'Roles',
+        model: 'Role',
         key: 'id'
-      },
-      onUpdate: 'CASCADE',
-      onDelete: 'SET NULL'
+      }
     },
     status: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 1,
-      validate: {
-        isIn: [[0, 1]]
-      }
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false
     }
-  }, {});
+  }, {
+    freezeTableName: true,
+  });
 
-  Users.associate = function(models) {
-    Users.belongsTo(models.Role, {
+  User.associate = function(models) {
+    // Relación muchos a uno: Un Usuario pertenece a un Rol
+    User.belongsTo(models.Role, {
       foreignKey: 'roleId',
-      as: 'role',
-      onDelete: 'SET NULL',
-      onUpdate: 'CASCADE'
+      as: 'Role'
     });
   };
 
-  return Users;
+  return User;
 };

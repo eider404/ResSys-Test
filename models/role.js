@@ -1,35 +1,34 @@
-'use strict';
+// models/role.js
 module.exports = (sequelize, DataTypes) => {
   const Role = sequelize.define('Role', {
     id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      primaryKey: true,
       autoIncrement: true,
-      primaryKey: true
     },
     name: {
       type: DataTypes.STRING,
-      allowNull: false,
-      unique: true
+      allowNull: false
     },
     createdAt: {
-      allowNull: false,
-      type: DataTypes.DATE
+      type: DataTypes.DATE,
+      allowNull: false
     },
     updatedAt: {
-      allowNull: false,
-      type: DataTypes.DATE
+      type: DataTypes.DATE,
+      allowNull: false
     }
-  }, {});
+  }, {
+    freezeTableName: true,
+  });
 
-  // Role.associate = function(models) {
-  //   Role.hasMany(models.User, {
-  //     foreignKey: 'roleId',
-  //     as: 'users',
-  //     onDelete: 'SET NULL',
-  //     onUpdate: 'CASCADE'
-  //   });
-  // };
+  Role.associate = function(models) {
+    // Relación uno a muchos: Un Rol tiene muchos Usuarios
+    Role.hasMany(models.User, {
+      foreignKey: 'roleId',  // clave foránea en la tabla Users
+      as: 'User'
+    });
+  };
 
   return Role;
 };
