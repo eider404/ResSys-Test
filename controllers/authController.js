@@ -36,7 +36,7 @@ exports.login = async (req, res) => {
 
   try {
     // Buscar el usuario
-    const user = await User.findOne({ where: { email }, include: ['role'] });
+    const user = await User.findOne({ where: { email }, include: ['Role'] });
     if (!user) {
       return res.status(400).json({ message: 'Email o contraseña incorrectos' });
     }
@@ -49,9 +49,9 @@ exports.login = async (req, res) => {
     }
 
     // Crear el token JWT
-    const token = jwt.sign({ id: user.id, role: user.role.name }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ id: user.id, role: user.roleId }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
-    return res.json({ token, user: { id: user.id, name: user.name, role: user.role.name } });
+    return res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.Role.name } });
   } catch (error) {
     return res.status(500).json({ message: 'Error del servidor', error });
   }
