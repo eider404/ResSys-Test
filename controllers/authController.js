@@ -7,6 +7,9 @@ exports.register = async (req, res) => {
   const { name, email, password, roleId } = req.body;
 
   try {
+    if (roleId === 1) {
+      throw new Error('Role ID cannot be 1');
+    }
     // Verificar si el correo ya existe
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
@@ -24,7 +27,11 @@ exports.register = async (req, res) => {
       roleId
     });
 
-    return res.status(201).json({ message: 'Usuario registrado con éxito' });
+    // return res.status(201).json({ message: 'Usuario registrado con éxito' });
+    const token = await jwt.sign({ id: newUser.dataValues.id, role: newUser.dataValues.roleId }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+    return res.json({ token, user: { id: newUser.dataValues.id, name: newUser.dataValues.name, email: newUser.dataValues.email, role: newUser.dataValues.roleId } });
+
   } catch (error) {
     return res.status(500).json({ message: 'Error del servidor', error });
   }
