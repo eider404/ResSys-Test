@@ -52,6 +52,24 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'roleId',
       as: 'Role'
     });
+
+    // Relación uno a muchos: Un Usuario tiene muchas Reservaciones
+    User.hasMany(models.Reservation, {
+      foreignKey: 'userClient',
+      as: 'Reservation'
+    });
+
+    //Relacion ano a uno: Un usuario tiene una Membership
+    User.hasOne(models.Membership, {
+      foreignKey: 'usersId',
+      as: 'Membership'
+    });
+
+    // Relación uno a muchos: Un Usuario tiene muchos Servicios
+    User.hasMany(models.Service, {
+      foreignKey: 'organizer',
+      as: 'Service'
+    });
   };
 
   return User;
