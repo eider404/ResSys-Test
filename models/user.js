@@ -60,16 +60,11 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     //Relacion ano a uno: Un usuario tiene una Membership
-    User.hasOne(models.Membership, {
+    User.hasOne(models.Organizer, {
       foreignKey: 'usersId',
-      as: 'Membership'
+      as: 'Organizer'
     });
 
-    // Relación uno a muchos: Un Usuario tiene muchos Servicios
-    User.hasMany(models.Service, {
-      foreignKey: 'organizer',
-      as: 'Service'
-    });
   };
 
   return User;

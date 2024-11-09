@@ -22,11 +22,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false
     },
-    organizer: {
+    organizerId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'User',
+        model: 'Organizer',
         key: 'id'
       }
     },
@@ -103,9 +103,9 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     // Relación muchos a uno: Un Service pertenece a una User
-    Service.belongsTo(models.User, {
-      foreignKey: 'organizer',
-      as: 'User'
+    Service.belongsTo(models.Organizer, {
+      foreignKey: 'organizerId',
+      as: 'Organizer'
     });
   };
 

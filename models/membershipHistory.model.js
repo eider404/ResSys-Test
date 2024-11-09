@@ -6,11 +6,11 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       autoIncrement: true,
     },
-    membershipId: {
+    organizerId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'Membership',
+        model: 'Organizer',
         key: 'id'
       }
     },
@@ -31,9 +31,9 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   MembershipHistory.associate = function(models) {
-    MembershipHistory.belongsTo(models.Membership, {
-      foreignKey: 'membershipId',
-      as: 'Membership'
+    MembershipHistory.belongsTo(models.Organizer, {
+      foreignKey: 'organizerId',
+      as: 'Organizer'
     });
   };
 

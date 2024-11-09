@@ -1,6 +1,6 @@
 // models/user.js
 module.exports = (sequelize, DataTypes) => {
-  const Membership = sequelize.define('Membership', {
+  const Organizer = sequelize.define('Organizer', {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -30,12 +30,12 @@ module.exports = (sequelize, DataTypes) => {
     freezeTableName: true,
   });
 
-  Membership.associate = function(models) {
-    Membership.belongsTo(models.User, {
+  Organizer.associate = function(models) {
+    Organizer.belongsTo(models.User, {
       foreignKey: 'usersId',
       as: 'User'
     });
   };
 
-  return Membership;
+  return Organizer;
 };
