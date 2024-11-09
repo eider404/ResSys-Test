@@ -7,8 +7,8 @@ exports.register = async (req, res) => {
   const { name, email, password, roleId } = req.body;
 
   try {
-    if (roleId === 1) {
-      throw new Error('Role ID cannot be 1');
+    if (roleId === 1 || roleId === 2) {
+      return res.status(400).json({ message: 'No permitido' });
     }
     // Verificar si el correo ya existe
     const existingUser = await User.findOne({ where: { email } });
