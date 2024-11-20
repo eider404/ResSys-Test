@@ -1,13 +1,43 @@
-const { Service } = require('../models');
+const { Service, Organizer } = require('../models');
+const { Op } = require("sequelize");
+
 
 class ServiceController {
   // Get all services
   static async getAll(req, res) {
     try {
-      const services = await Service.findAll();
-      res.status(200).json(services);
+      const { page = 1, limit = process.env.DEFAULT_PAGINATE, status } = req.query;
+      const offset = (page - 1) * limit;
+      const where = status ? { status } : {};
+
+      const currentDate = new Date();
+
+      const service = await Service.findAndCountAll({
+        where,
+        limit: parseInt(limit),
+        offset: parseInt(offset),
+        include: [
+          {
+            model: Organizer,
+            as: "Organizer",
+            where: {
+              endMembership: {
+                [Op.gte]: currentDate, // Verifica que endMembership no sea menor a la fecha actual
+              },
+            },
+            required: true, // Solo servicios con un organizador que cumpla la condición
+          },
+        ],
+      });
+
+      return res.status(200).json({
+        total: service.count,
+        pages: Math.ceil(service.count / limit),
+        data: service.rows,
+      });
+
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      return res.status(500).json({ error: error.message });
     }
   }
 
@@ -29,9 +59,21 @@ class ServiceController {
   // Create a new service
   static async create(req, res) {
     try {
-      const service = await Service.create(req.body);
+
+      const newService = req.body;
+      newService.organizerId = await Organizer.findOne({ where: { usersId: req.user.id } }).then((organizer) => organizer?.id);
+
+      if (!newService.organizerId) {
+        return res.status(400).json({ error: 'User is not an organizer' });
+      }
+
+      const service = await Service.create(newService);
+
       res.status(201).json(service);
     } catch (error) {
+      if (error.name === 'SequelizeValidationError') {
+        return res.status(400).json({ errors: error.errors.map(err => err.message) });
+      }
       res.status(500).json({ error: error.message });
     }
   }
@@ -40,16 +82,26 @@ class ServiceController {
   static async update(req, res) {
     try {
       const { id } = req.params;
+
+      delete req.body.organizerId;
+
+      const organizer = await Organizer.findOne({ where: { usersId: req.user.id } }).then((organizer) => organizer?.id ? organizer.id : null);
+
       const [updated] = await Service.update(req.body, {
-        where: { id: id }
+        where: { id: id , organizerId: organizer }
       });
-      if (updated) {
-        const updatedService = await Service.findByPk(id);
-        res.status(200).json(updatedService);
-      } else {
-        res.status(404).json({ error: 'Service not found' });
+
+      if (!updated) {
+        return res.status(404).json({ error: 'Service not found' });
       }
+
+      const updatedService = await Service.findByPk(id);
+
+      return res.status(200).json(updatedService);
     } catch (error) {
+      if (error.name === 'SequelizeValidationError') {
+        return res.status(400).json({ errors: error.errors.map(err => err.message) });
+      }
       res.status(500).json({ error: error.message });
     }
   }
@@ -58,8 +110,11 @@ class ServiceController {
   static async delete(req, res) {
     try {
       const { id } = req.params;
+
+      const organizer = await Organizer.findOne({ where: { usersId: req.user.id } }).then((organizer) => organizer?.id ? organizer.id : null);
+
       const deleted = await Service.destroy({
-        where: { id: id }
+        where: { id: id, organizerId: organizer }
       });
       if (deleted) {
         res.status(204).json();
