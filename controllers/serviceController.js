@@ -1,6 +1,20 @@
 const { Service, Organizer } = require('../models');
 const { Op } = require("sequelize");
 
+const validateSlug = async (slug, ServiceModel) => {
+  const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+  
+  if (!slugRegex.test(slug)) {
+    throw new Error('El slug tiene un formato inválido. Solo puede contener letras minúsculas, números y guiones.');
+  }
+
+  const existingService = await ServiceModel.findOne({ where: { slug } });
+  if (existingService) {
+    throw new Error('El slug ya existe en la base de datos. Por favor, elige uno diferente.');
+  }
+
+  return true; 
+};
 
 class ServiceController {
   // Get all services
@@ -69,6 +83,8 @@ class ServiceController {
         return res.status(400).json({ error: 'User is not an organizer' });
       }
 
+      await validateSlug(newService.slug, Service);
+
       const service = await Service.create(newService);
 
       res.status(201).json(service);
@@ -120,6 +136,20 @@ class ServiceController {
       });
       if (deleted) {
         res.status(204).json();
+      } else {
+        res.status(404).json({ error: 'Service not found' });
+      }
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  static async getBySlug(req, res) {
+    try {
+      const { slug } = req.params;
+      const service = await Service.findOne({ where: { slug: slug } });
+      if (service) {
+        res.status(200).json(service);
       } else {
         res.status(404).json({ error: 'Service not found' });
       }
