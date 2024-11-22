@@ -6,9 +6,11 @@ class ServiceController {
   // Get all services
   static async getAll(req, res) {
     try {
-      const { page = 1, limit = process.env.DEFAULT_PAGINATE, status } = req.query;
+      const { page = 1, limit = process.env.DEFAULT_PAGINATE, status, name, category } = req.query;
       const offset = (page - 1) * limit;
-      const where = status ? { status } : {};
+
+      const nameFilter = name ? { nameService: { [Op.like]: `%${name}%` } } : {};
+      const where = { ...nameFilter, ...(status ? { status } : {}), ...(category ? { categoryId:category } : {}) };
 
       const currentDate = new Date();
 
