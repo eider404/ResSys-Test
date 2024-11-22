@@ -147,7 +147,9 @@ class ServiceController {
   static async getBySlug(req, res) {
     try {
       const { slug } = req.params;
-      const service = await Service.findOne({ where: { slug: slug } });
+      
+      const service = await Service.findOne({ where: { slug: slug }, include: ['Category'] });
+
       if (service) {
         res.status(200).json(service);
       } else {
